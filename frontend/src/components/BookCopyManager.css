@@ -1,0 +1,1003 @@
+/* =========================================================
+   SMARTLIB — BOOK COPY MANAGER
+   Light UI / Admin Design System
+   ========================================================= */
+
+.copy-manager-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  backdrop-filter: blur(5px);
+}
+
+
+/* =========================================================
+   MAIN MODAL
+   ========================================================= */
+
+.copy-manager {
+  width: min(760px, 100%);
+  max-height: 85vh;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border: 1px solid #e3e1db;
+  border-radius: 20px;
+
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.copy-manager-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 28px 30px;
+
+  border-bottom: 1px solid #e8e6e0;
+
+  background: #ffffff;
+}
+
+.copy-manager-eyebrow {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #8c8a84;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1.8px;
+
+  text-transform: uppercase;
+}
+
+.copy-manager-header h2 {
+  margin: 0;
+
+  color: #171717;
+
+  font-size: 26px;
+  line-height: 1.1;
+
+  letter-spacing: -0.7px;
+}
+
+.copy-manager-header p {
+  margin: 7px 0 0;
+
+  color: #77756f;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.copy-manager-close {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #dedcd6;
+  border-radius: 10px;
+
+  background: #f5f4f0;
+
+  color: #55534e;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.copy-manager-close:hover {
+  background: #ebeae5;
+
+  border-color: #cbc9c2;
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.copy-manager-error {
+  margin: 20px 24px 0;
+
+  padding: 14px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border: 1px solid #f0d5d2;
+  border-radius: 11px;
+
+  background: #fff6f5;
+
+  color: #b42318;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+.copy-manager-error button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #8f2119;
+
+  cursor: pointer;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.copy-manager-error button:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================================
+   COPY LIST
+   ========================================================= */
+
+.copy-list {
+  padding: 20px 24px 28px;
+
+  overflow-y: auto;
+
+  background: #fafaf8;
+}
+
+
+/* =========================================================
+   COPY ITEM
+   ========================================================= */
+
+.copy-item {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 17px;
+
+  margin-bottom: 12px;
+
+  border: 1px solid #e4e2dc;
+
+  border-radius: 15px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.025);
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.copy-item:last-child {
+  margin-bottom: 0;
+}
+
+.copy-item:hover {
+  border-color: #d0cec7;
+
+  box-shadow:
+    0 9px 25px rgba(0, 0, 0, 0.045);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   COPY ICON
+   ========================================================= */
+
+.copy-icon {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #e2e0da;
+
+  border-radius: 12px;
+
+  background: #f4f3ef;
+
+  color: #5f5d57;
+}
+
+
+/* =========================================================
+   COPY MAIN
+   ========================================================= */
+
+.copy-main {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.copy-title-row {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+.copy-title-row strong {
+  color: #20201e;
+
+  font-size: 15px;
+
+  letter-spacing: -0.2px;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.copy-status {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+
+  text-transform: uppercase;
+}
+
+.copy-available {
+  background: #eaf8ef;
+  color: #16733a;
+}
+
+.copy-borrowed {
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.copy-reserved {
+  background: #fff7e6;
+  color: #9a6700;
+}
+
+.copy-default {
+  background: #f1f1ee;
+  color: #66645e;
+}
+
+
+/* =========================================================
+   COPY META
+   ========================================================= */
+
+.copy-meta {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 15px;
+
+  margin-top: 7px;
+
+  color: #77756f;
+
+  font-size: 11px;
+}
+
+.copy-meta span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 4px;
+}
+
+.copy-meta svg {
+  color: #9a9891;
+}
+
+
+/* =========================================================
+   OLD PRINT BUTTON
+   ========================================================= */
+
+.print-qr-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  flex-shrink: 0;
+
+  min-height: 38px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dedcd6;
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #34332f;
+
+  cursor: pointer;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.print-qr-button:hover {
+  background: #f5f4f0;
+
+  border-color: #c9c7c0;
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   QR BUTTON
+   ========================================================= */
+
+.copy-qr-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  flex-shrink: 0;
+
+  min-height: 38px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dedcd6;
+
+  border-radius: 9px;
+
+  background: #f7f6f2;
+
+  color: #34332f;
+
+  font-size: 10px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.copy-qr-button:hover {
+  background: #efeee9;
+
+  border-color: #c9c7c0;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05);
+
+  transform: translateY(-1px);
+}
+
+.copy-qr-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.copy-manager-loading {
+  min-height: 280px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  color: #77756f;
+
+  background: #fafaf8;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.copy-manager-empty {
+  min-height: 280px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  color: #77756f;
+
+  background: #fafaf8;
+
+  text-align: center;
+}
+
+.copy-manager-empty svg {
+  color: #aaa8a1;
+}
+
+.copy-manager-empty h3 {
+  margin: 14px 0 4px;
+
+  color: #222222;
+
+  font-size: 17px;
+}
+
+.copy-manager-empty p {
+  max-width: 360px;
+
+  margin: 0;
+
+  color: #85837d;
+
+  font-size: 11px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   SPINNER
+   ========================================================= */
+
+.spin {
+  animation:
+    spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.copy-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.copy-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.copy-list::-webkit-scrollbar-thumb {
+  background: #d5d3cc;
+
+  border-radius: 999px;
+}
+
+.copy-list::-webkit-scrollbar-thumb:hover {
+  background: #bbb9b1;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  .copy-manager-overlay {
+    padding: 14px;
+  }
+
+  .copy-manager {
+    max-height: 90vh;
+
+    border-radius: 17px;
+  }
+
+  .copy-manager-header {
+    padding: 22px;
+  }
+
+  .copy-list {
+    padding: 16px;
+  }
+
+  .copy-item {
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+  }
+
+  .copy-main {
+    min-width: calc(100% - 64px);
+  }
+
+  .copy-qr-button,
+  .print-qr-button {
+    width: 100%;
+
+    justify-content: center;
+
+    margin-top: 2px;
+  }
+
+  .copy-meta {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 5px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 450px) {
+
+  .copy-manager-overlay {
+    padding: 8px;
+  }
+
+  .copy-manager {
+    width: 100%;
+
+    max-height: 94vh;
+
+    border-radius: 15px;
+  }
+
+  .copy-manager-header {
+    padding: 19px;
+  }
+
+  .copy-manager-header h2 {
+    font-size: 23px;
+  }
+
+  .copy-list {
+    padding: 13px;
+  }
+
+  .copy-item {
+    padding: 14px;
+  }
+
+  .copy-icon {
+    width: 43px;
+    height: 43px;
+  }
+
+  .copy-title-row strong {
+    font-size: 14px;
+  }
+
+  .copy-status {
+    font-size: 8px;
+  }
+
+  .copy-manager-error {
+    margin: 14px 14px 0;
+
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .copy-manager-error button {
+    padding: 0;
+  }
+}
+
+.copy-deactivate-button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.copy-deactivate-button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.copy-deactivate-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* ============================================================
+   COPY ACTIONS
+   ============================================================ */
+
+.copy-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* ============================================================
+   EDIT BUTTON
+   ============================================================ */
+
+.copy-edit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.copy-edit-button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.copy-edit-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   EDIT OVERLAY
+   ============================================================ */
+
+.copy-edit-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(15, 23, 42, 0.55);
+}
+
+
+/* ============================================================
+   EDIT MODAL
+   ============================================================ */
+
+.copy-edit-modal {
+  width: min(520px, 100%);
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.22);
+
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   EDIT HEADER
+   ============================================================ */
+
+.copy-edit-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding: 26px 28px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.copy-edit-header h3 {
+  margin: 6px 0 4px;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.copy-edit-header p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+
+/* ============================================================
+   EDIT FORM
+   ============================================================ */
+
+.copy-edit-form {
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+
+.copy-edit-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.copy-edit-field > span,
+.copy-edit-readonly > span {
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+
+  color: #6b7280;
+}
+
+
+.copy-edit-field input,
+.copy-edit-field select {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #111827;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+
+.copy-edit-field input:focus,
+.copy-edit-field select:focus {
+  border-color: #9ca3af;
+
+  box-shadow:
+    0 0 0 3px rgba(156, 163, 175, 0.16);
+}
+
+
+/* ============================================================
+   READ ONLY STATUS
+   ============================================================ */
+
+.copy-edit-readonly {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 13px 14px;
+
+  border-radius: 9px;
+
+  background: #f9fafb;
+
+  border: 1px solid #e5e7eb;
+}
+
+
+.copy-edit-readonly strong {
+  font-size: 13px;
+
+  color: #374151;
+}
+
+
+/* ============================================================
+   EDIT ACTIONS
+   ============================================================ */
+
+.copy-edit-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding-top: 6px;
+}
+
+
+.copy-edit-cancel,
+.copy-edit-save {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 10px 16px;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.copy-edit-cancel {
+  border: 1px solid #d1d5db;
+
+  background: #ffffff;
+
+  color: #374151;
+}
+
+
+.copy-edit-save {
+  border: 1px solid #1f2937;
+
+  background: #1f2937;
+
+  color: #ffffff;
+}
+
+
+.copy-edit-cancel:disabled,
+.copy-edit-save:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+
+  .copy-actions {
+    flex-wrap: wrap;
+  }
+
+  .copy-edit-overlay {
+    padding: 14px;
+  }
+
+  .copy-edit-header {
+    padding: 22px;
+  }
+
+  .copy-edit-form {
+    padding: 22px;
+  }
+
+}

@@ -1,0 +1,275 @@
+/* =========================================================
+   SmartLib Application Layout
+   ========================================================= */
+
+.sl-app {
+  min-height: 100vh;
+  background: var(--sl-white);
+}
+
+.sl-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+
+  width: var(--sidebar-width);
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--sl-white);
+  border-right: 1px solid var(--sl-grey-200);
+
+  z-index: 100;
+}
+
+.sl-brand {
+  height: var(--header-height);
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 24px;
+
+  border-bottom: 1px solid var(--sl-grey-200);
+}
+
+.sl-brand-mark {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--sl-charcoal);
+  color: var(--sl-white);
+
+  border-radius: 7px;
+
+  font-weight: 700;
+}
+
+.sl-brand-name {
+  margin-left: 11px;
+
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.sl-nav {
+  flex: 1;
+  padding: 20px 12px;
+}
+
+.sl-nav-section {
+  margin: 18px 12px 8px;
+
+  color: var(--sl-grey-400);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.sl-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  width: 100%;
+  min-height: 42px;
+
+  padding: 0 12px;
+
+  margin-bottom: 3px;
+
+  border-radius: 7px;
+
+  color: var(--sl-grey-700);
+
+  font-size: 14px;
+  font-weight: 500;
+
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.sl-nav-link:hover {
+  background: var(--sl-grey-50);
+  color: var(--sl-black);
+}
+
+.sl-nav-link.active {
+  background: var(--sl-grey-100);
+  color: var(--sl-black);
+  font-weight: 650;
+}
+
+.sl-sidebar-user {
+  padding: 16px;
+
+  border-top: 1px solid var(--sl-grey-200);
+}
+
+.sl-user-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 9px;
+
+  border-radius: 8px;
+}
+
+.sl-avatar {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: var(--sl-grey-100);
+  color: var(--sl-charcoal);
+
+  border-radius: 50%;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sl-user-info {
+  min-width: 0;
+}
+
+.sl-user-name {
+  overflow: hidden;
+
+  color: var(--sl-black);
+
+  font-size: 13px;
+  font-weight: 650;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sl-user-role {
+  color: var(--sl-grey-500);
+  font-size: 11px;
+}
+
+.sl-main {
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+}
+
+.sl-header {
+  position: sticky;
+  top: 0;
+
+  height: var(--header-height);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 32px;
+
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--sl-grey-200);
+
+  backdrop-filter: blur(8px);
+
+  z-index: 90;
+}
+
+.sl-header-left,
+.sl-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sl-header-search {
+  width: 280px;
+}
+
+.sl-icon-button {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+  color: var(--sl-grey-700);
+}
+
+.sl-icon-button:hover {
+  background: var(--sl-grey-100);
+  color: var(--sl-black);
+}
+
+@media (max-width: 900px) {
+  .sl-sidebar {
+    width: 72px;
+  }
+
+  .sl-brand {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sl-brand-name,
+  .sl-nav-section,
+  .sl-nav-link span,
+  .sl-sidebar-user .sl-user-info {
+    display: none;
+  }
+
+  .sl-nav-link {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sl-user-card {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sl-main {
+    margin-left: 72px;
+  }
+
+  .sl-header-search {
+    width: 200px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sl-sidebar {
+    display: none;
+  }
+
+  .sl-main {
+    margin-left: 0;
+  }
+
+  .sl-header {
+    padding: 0 16px;
+  }
+
+  .sl-header-search {
+    display: none;
+  }
+}

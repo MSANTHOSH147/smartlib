@@ -1,0 +1,68 @@
+# ============================================================
+# SMARTLIB
+# ============================================================
+
+# ----------------------------
+# Backend - Java / Maven
+# ----------------------------
+
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Java compiled files
+*.class
+
+# Logs
+*.log
+
+# ----------------------------
+# Frontend - Node / Vite
+# ----------------------------
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ----------------------------
+# Environment / Secrets
+# ----------------------------
+
+.env
+.env.*
+!.env.example
+
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+
+# ----------------------------
+# IDE
+# ----------------------------
+
+.vscode/
+.idea/
+*.iml
+
+# ----------------------------
+# OS
+# ----------------------------
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----------------------------
+# Temporary / backup files
+# ----------------------------
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# Project backup files
+*.backup.jsx
+*.backup.js
+backend/*_backup*.sql
