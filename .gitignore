@@ -66,3 +66,4 @@ desktop.ini
 *.backup.jsx
 *.backup.js
 backend/*_backup*.sql
+smartlib_before_deployment.sql
