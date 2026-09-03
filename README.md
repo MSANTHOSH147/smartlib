@@ -1,242 +1,79 @@
-\# SmartLib 📚
+# SmartLib 📚
 
+A full-stack Library Management System designed to manage books, physical book copies, members, borrowing, returns, reservations, fines, and QR-based circulation through a modern web application.
 
+## 🌐 Live Demo
 
-A full-stack digital library management system built with React, Spring Boot, and MySQL.
+**Frontend:**  
+https://smartlib-frontend-nmml.onrender.com
 
+**Backend API:**  
+https://smartlib-backend-62iz.onrender.com
 
+**GitHub:**  
+https://github.com/MSANTHOSH147/smartlib
 
-SmartLib manages both digital library operations and physical book circulation, including QR-based borrowing and returning of physical book copies.
+---
 
+## 📌 Overview
 
+SmartLib is a modern library management platform built to digitize everyday library operations.
 
-\## 🚀 Features
+Instead of treating a book as a single database record, SmartLib tracks individual physical copies, allowing libraries to manage availability, borrowing, returns, reservations, and QR-based circulation more accurately.
 
+The system provides separate workflows for administrators and library members.
 
+---
 
-\### Authentication \& Security
+## ✨ Features
 
-\- User registration and login
+### 🔐 Authentication
 
-\- JWT-based authentication
+- User registration and login
+- JWT-based authentication
+- Role-based access control
+- Protected admin routes
+- Password reset workflow
+- Email verification support
 
-\- Role-based access control
+### 📚 Book Management
 
-\- Member and administrator accounts
+- Add and manage books
+- Search and browse books
+- Book details
+- Category management
+- Physical copy tracking
 
-\- Password reset functionality
+### 📦 Physical Book Copies
 
-\- Change password functionality
+Each physical copy is tracked independently.
 
+Supported copy states include:
 
+- AVAILABLE
+- BORROWED
+- RESERVED
+- DAMAGED
+- LOST
+- MAINTENANCE
 
-\### 📚 Book Management
+This allows the system to maintain accurate real-world inventory.
 
-\- Browse books
+### 📱 QR-Based Circulation
 
-\- Search and explore library books
+SmartLib supports QR-based identification of individual physical book copies.
 
-\- Book categories
-
-\- Book details
-
-\- Book availability
-
-\- Book reviews
-
-
-
-\### 📦 Physical Inventory
-
-\- Manage physical book copies
-
-\- Automatic copy numbering
-
-\- QR token generation
-
-\- QR label generation
-
-\- Download QR labels
-
-\- Print QR labels
-
-\- Track copy status
-
-\- Track physical condition
-
-\- Track physical location
-
-\- Activate/deactivate physical copies
-
-\- Prevent modification of borrowed copies
-
-
-
-\### 📱 QR-Based Library Circulation
-
-\- Scan physical book QR codes
-
-\- Identify individual physical copies
-
-\- Member QR borrowing
-
-\- Member QR return
-
-\- Administrator QR return
-
-\- Prevent borrowing unavailable copies
-
-\- Prevent members from returning books they do not own
-
-\- Track exact physical copy circulation
-
-
-
-\### 🔄 Borrowing
-
-\- Borrow books
-
-\- Return books
-
-\- Active borrowing history
-
-\- Due dates
-
-\- Overdue tracking
-
-\- Physical-copy tracking
-
-
-
-\### 📅 Reservations
-
-\- Create reservations
-
-\- View reservations
-
-\- Waiting reservations
-
-\- Ready reservations
-
-\- Reservation status management
-
-
-
-\### 💰 Fine Management
-
-\- Automatic overdue fine calculation
-
-\- View fines
-
-\- Unpaid fines
-
-\- Fine payment
-
-\- Administrator fine management
-
-
-
-\### 👨‍💼 Administration
-
-\- Admin dashboard
-
-\- Member management
-
-\- Book management
-
-\- Physical inventory management
-
-\- Borrowing management
-
-\- Reservation management
-
-\- Fine management
-
-\- QR-based physical book returns
-
-
-
-\### 📧 Notifications
-
-\- Email service integration
-
-\- Password reset emails
-
-\- Library-related notifications
-
-
-
-\## 🛠️ Technology Stack
-
-
-
-\### Frontend
-
-\- React
-
-\- Vite
-
-\- React Router
-
-\- Axios
-
-\- Lucide React
-
-\- QR scanning
-
-\- Responsive UI
-
-
-
-\### Backend
-
-\- Java
-
-\- Spring Boot
-
-\- Spring Security
-
-\- Spring Data JPA
-
-\- Hibernate
-
-\- JWT
-
-\- Maven
-
-
-
-\### Database
-
-\- MySQL
-
-
-
-\## 🏗️ Architecture
-
-
+Workflow:
 
 ```text
-
-&#x20;                   SmartLib
-
-&#x20;                      │
-
-&#x20;         ┌────────────┴────────────┐
-
-&#x20;         │                         │
-
-&#x20;     Frontend                   Backend
-
-&#x20;      React                  Spring Boot
-
-&#x20;       │                         │
-
-&#x20;       │ REST API                │
-
-&#x20;       └──────────────┬──────────┘
-
-&#x20;                      │
-
-&#x20;                    MySQL
-
+Physical Book
+      ↓
+QR Code
+      ↓
+Scan
+      ↓
+Identify Book Copy
+      ↓
+Borrow / Return
+      ↓
+Update Inventory
