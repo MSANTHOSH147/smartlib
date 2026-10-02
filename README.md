@@ -67,7 +67,75 @@ Render
 
 ---
 
-# ✨ Features
+# 🤖 SmartLib AI — Retrieval-Augmented Library Intelligence
+
+SmartLib AI is not a generic conversational chatbot wrapper. It is a multi-model, retrieval-augmented intelligence system engineered to bridge physical library operations, semantic vector discovery, transactional database state, and open AI protocols.
+
+### 🏛️ SmartLib AI Architecture
+
+```text
+                               SMARTLIB AI ASSISTANT
+                                         │
+                                ┌────────▼────────┐
+                                │ AI ORCHESTRATOR │
+                                └────────┬────────┘
+                                         │
+                     ┌───────────────────┼───────────────────┐
+                     │                   │                   │
+                     ▼                   ▼                   ▼
+               SmartLib Tools      Web Grounding            MCP
+                     │             (Google Search)      (MCP Server)
+                     ▼                                       │
+            Hybrid Retrieval                                 ▼
+                     │                                Read-Only Gateway
+             ┌───────┴───────┐                        (Tools & Prompts)
+             ▼               ▼
+        MySQL Lexical   Qdrant Vectors
+        (Authoritative) (gemini-embedding-2 / 768d)
+             │               │
+             └───────┬───────┘
+                     ▼
+          Reciprocal Rank Fusion (RRF, k=60)
+                     │
+                     ▼
+          Top 20 Candidate Books
+                     │
+                     ▼
+          DeterministicBookReranker
+          (5-Signal Normalized Scoring)
+                     │
+                     ▼
+          Top 5 Hydrated Final Books
+                     │
+         ┌───────────┴───────────┐
+         ▼                       ▼
+   Primary: Gemini 3.8 Flash   Fallback: Groq (Llama 3.3 70B)
+   (Function Calling)          (Automatic Circuit Breaker)
+         │                       │
+         └───────────┬───────────┘
+                     ▼
+           Answer + Sources (Attributed)
+                     │
+                     ▼
+        Observability & Telemetry
+        (AiRequestTrace + Micrometer Metrics)
+```
+
+### 🚀 Key AI Capabilities
+1. **Multi-Model Routing & High Availability**: Primary reasoning powered by **Google Gemini 3.8 Flash** with automatic circuit breaker failover to **Groq Cloud (Llama 3.3 70B Versatile)** during rate limits or outages.
+2. **Hybrid RRF Search**: Merges relational SQL full-text matching with **Qdrant** vector similarity over 768-dimensional `gemini-embedding-2` representations using Reciprocal Rank Fusion ($k=60$).
+3. **Deterministic Reranker**: Post-retrieval reranking pipeline scoring semantic similarity, lexical rank, exact title match, author match, and category alignment to surface the optimal Top 5 books.
+4. **Authoritative Inventory Grounding**: The LLM is never an authorization boundary. Physical copy availability, shelf locations, and user loans are hydrated directly from MySQL transactions.
+5. **Personalized Recommendations**: Combines previous borrowing history, memory preferences, and catalog ratings to recommend relevant titles.
+6. **User Memory with Privacy Controls**: Inert user preference storage (`<USER_MEMORY>`) allowing users to inspect and forget saved preferences on demand.
+7. **Real-Time Web Grounding**: Google Search grounding dynamically retrieves contemporary facts and publishing news with verified source citations.
+8. **Model Context Protocol (MCP)**: Implements an MCP stdio server allowing external AI agents (e.g. Claude Desktop) to discover catalog tools and resources.
+9. **Factual AI Evaluation**: Versioned benchmark framework (`smartlib-ai-evaluation.json`) measuring tool selection accuracy, security bounds, and retrieval recall.
+10. **Privacy-Preserving Observability**: Structured request tracing (`AiRequestTrace`), UUID request correlation (`X-AI-Request-Id`), and Micrometer metrics without logging prompts or user data.
+
+---
+
+# ✨ Core Application Features
 
 ## 🔐 Authentication & Authorization
 

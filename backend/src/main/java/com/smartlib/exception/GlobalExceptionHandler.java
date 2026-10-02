@@ -24,6 +24,37 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleRateLimit(
+            RateLimitExceededException ex) {
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(
+                Map.of(
+                        "success", false,
+                        "message", ex.getMessage(),
+                        "timestamp", LocalDateTime.now()
+                )
+        );
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(
+            org.springframework.web.bind.MethodArgumentNotValidException ex) {
+
+        String errorMsg = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation failed");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of(
+                        "success", false,
+                        "message", errorMsg,
+                        "timestamp", LocalDateTime.now()
+                )
+        );
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequest(
             BadRequestException ex) {
@@ -32,6 +63,32 @@ public class GlobalExceptionHandler {
                 Map.of(
                         "success", false,
                         "message", ex.getMessage(),
+                        "timestamp", LocalDateTime.now()
+                )
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(
+            IllegalArgumentException ex) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of(
+                        "success", false,
+                        "message", ex.getMessage() != null ? ex.getMessage() : "Invalid request parameter",
+                        "timestamp", LocalDateTime.now()
+                )
+        );
+    }
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleMalformedJson(
+            org.springframework.http.converter.HttpMessageNotReadableException ex) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of(
+                        "success", false,
+                        "message", "Malformed JSON request payload",
                         "timestamp", LocalDateTime.now()
                 )
         );

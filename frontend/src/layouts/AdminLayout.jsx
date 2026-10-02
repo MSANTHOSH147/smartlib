@@ -9,8 +9,10 @@ import {
   ArrowLeft,
   LogOut,
   ScanLine,
+  Sparkles,
 } from "lucide-react";
 
+import AIFloatingWidget from "../components/AIAssistant/AIFloatingWidget";
 import "./AdminLayout.css";
 
 function AdminLayout() {
@@ -24,6 +26,11 @@ function AdminLayout() {
       path: "/admin/books",
       label: "Books",
       icon: BookOpen,
+    },
+    {
+      path: "/admin/ai",
+      label: "AI Assistant",
+      icon: Sparkles,
     },
     {
     path: "/admin/qr-scanner",
@@ -131,6 +138,8 @@ function AdminLayout() {
       <main className="admin-main">
         <Outlet />
       </main>
+
+      <AIFloatingWidget />
 
     </div>
   );

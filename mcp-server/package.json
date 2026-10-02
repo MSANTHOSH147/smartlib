@@ -1,0 +1,28 @@
+{
+  "name": "smartlib-mcp-server",
+  "version": "1.0.0",
+  "description": "SmartLib Model Context Protocol (MCP) Server",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "node --test"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "smartlib",
+    "library"
+  ],
+  "author": "SmartLib AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}
