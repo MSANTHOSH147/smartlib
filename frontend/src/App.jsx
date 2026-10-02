@@ -1,4 +1,4 @@
-﻿import {
+import {
   BrowserRouter,
   Navigate,
   Route,
@@ -37,10 +37,12 @@ import MyBorrowings from "./pages/MyBorrowings";
 import Reservations from "./pages/Reservations";
 
 import Fines from "./pages/Fines";
-
 import Profile from "./pages/Profile";
 
-import QRScanner from "./pages/QRScanner";
+import { lazy, Suspense } from "react";
+
+const QRScanner = lazy(() => import("./pages/QRScanner"));
+const AIAssistantPage = lazy(() => import("./pages/AIAssistantPage"));
 
 
 // ============================================================
@@ -166,6 +168,18 @@ function App() {
           />
 
 
+          {/* AI ASSISTANT */}
+
+          <Route
+            path="/ai"
+            element={
+              <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading AI Assistant...</div>}>
+                <AIAssistantPage />
+              </Suspense>
+            }
+          />
+
+
           {/* BOOKS */}
 
           <Route
@@ -191,7 +205,9 @@ function App() {
           <Route
             path="/qr-scanner"
             element={
-              <QRScanner />
+              <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading Scanner...</div>}>
+                <QRScanner />
+              </Suspense>
             }
           />
 
@@ -264,6 +280,18 @@ function App() {
             }
           />
 
+
+          {/* ADMIN AI ASSISTANT */}
+
+          <Route
+            path="/admin/ai"
+            element={
+              <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading AI Assistant...</div>}>
+                <AIAssistantPage />
+              </Suspense>
+            }
+          />
+
           {/* ====================================================
     ADMIN QR SCANNER
 ==================================================== */}
@@ -271,7 +299,9 @@ function App() {
 <Route
   path="/admin/qr-scanner"
   element={
-    <QRScanner />
+    <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading Scanner...</div>}>
+      <QRScanner />
+    </Suspense>
   }
 />
 

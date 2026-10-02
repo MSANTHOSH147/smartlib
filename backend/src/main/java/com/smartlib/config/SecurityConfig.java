@@ -53,15 +53,18 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-        List.of(
+        List<String> allowedOrigins = new java.util.ArrayList<>(List.of(
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://127.0.0.1:5173",
                 "http://127.0.0.1:5174",
                 "https://smartlib-frontend-nmml.onrender.com"
-        )
-);
+        ));
+        String envFrontend = System.getenv("FRONTEND_URL");
+        if (envFrontend != null && !envFrontend.isBlank() && !allowedOrigins.contains(envFrontend.trim())) {
+            allowedOrigins.add(envFrontend.trim());
+        }
+        configuration.setAllowedOrigins(allowedOrigins);
 
         configuration.setAllowedMethods(
                 List.of(
@@ -210,6 +213,31 @@ public class SecurityConfig {
 auth.requestMatchers(
         "/api/book-copies/qr/**"
 ).hasAnyRole("MEMBER", "ADMIN");
+
+                    // =================================================
+                    // AI ASSISTANT
+                    // MEMBER + ADMIN
+                    // =================================================
+
+                    auth.requestMatchers(
+                            "/api/ai/**"
+                    ).hasAnyRole("MEMBER", "ADMIN");
+
+
+                    // =================================================
+                    // OBSERVABILITY / ACTUATOR
+                    // Health/info public for cloud orchestration; metrics admin only
+                    // =================================================
+
+                    auth.requestMatchers(
+                            "/actuator/health",
+                            "/actuator/info"
+                    ).permitAll();
+
+                    auth.requestMatchers(
+                            "/actuator/metrics",
+                            "/actuator/metrics/**"
+                    ).hasRole("ADMIN");
 
 
                     // =================================================

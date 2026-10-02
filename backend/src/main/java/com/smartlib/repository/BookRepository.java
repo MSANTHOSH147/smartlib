@@ -16,4 +16,15 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByAvailableCopiesGreaterThan(Integer copies);
 
     boolean existsByIsbn(String isbn);
+
+    @org.springframework.data.jpa.repository.Query("""
+        SELECT b FROM Book b
+        WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(b.author) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(b.isbn) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(b.description) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(b.category.name) LIKE LOWER(CONCAT('%', :query, '%'))
+    """)
+    List<Book> searchLexical(@org.springframework.data.repository.query.Param("query") String query);
 }

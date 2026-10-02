@@ -1,4 +1,4 @@
-﻿import {
+import {
   NavLink,
   Navigate,
   Outlet,
@@ -16,6 +16,7 @@ import {
   LogOut,
   Menu,
   X,
+  Sparkles,
 } from "lucide-react";
 
 import { useState } from "react";
@@ -25,6 +26,7 @@ import {
   logout,
 } from "../services/authService";
 
+import AIFloatingWidget from "../components/AIAssistant/AIFloatingWidget";
 import "./ProtectedLayout.css";
 
 
@@ -60,6 +62,12 @@ function ProtectedLayout() {
       label: "Browse Books",
       path: "/books",
       icon: BookOpen,
+    },
+
+    {
+      label: "AI Assistant",
+      path: "/ai",
+      icon: Sparkles,
     },
 
     {
@@ -312,6 +320,8 @@ function ProtectedLayout() {
         <Outlet />
 
       </main>
+
+      <AIFloatingWidget />
 
     </div>
 

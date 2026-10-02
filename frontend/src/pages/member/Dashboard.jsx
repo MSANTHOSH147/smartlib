@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -9,6 +9,7 @@ import {
   Loader2,
   QrCode,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -216,6 +217,17 @@ function Dashboard() {
     >
       <Search size={17} />
       Browse Books
+    </Link>
+
+    {/* AI ASSISTANT */}
+
+    <Link
+      to="/ai"
+      className="dashboard-primary-button"
+      title="Ask SmartLib AI Assistant"
+    >
+      <Sparkles size={17} />
+      AI Assistant
     </Link>
 
   </div>

@@ -67,3 +67,6 @@ desktop.ini
 *.backup.js
 backend/*_backup*.sql
 smartlib_before_deployment.sql
+# Node dependencies and build output
+node_modules/
+dist/
