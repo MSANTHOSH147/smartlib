@@ -1,5 +1,6 @@
 package com.smartlib.ai.dto.gemini;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -17,4 +18,7 @@ public class FunctionCall {
 
     private String name;
     private Map<String, Object> args;
+
+    @JsonIgnore
+    private String thoughtSignature;
 }

@@ -344,6 +344,7 @@ public class SmartLibAiOrchestrator {
                 calls.add(AiToolCall.builder()
                         .name(part.getFunctionCall().getName())
                         .arguments(part.getFunctionCall().getArgs())
+                        .thoughtSignature(part.getThoughtSignature())
                         .build());
             }
         }

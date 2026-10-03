@@ -114,7 +114,9 @@ public class GeminiChatResponse {
         List<FunctionCall> calls = new ArrayList<>();
         for (Part part : candidate.getContent().getParts()) {
             if (part != null && part.getFunctionCall() != null) {
-                calls.add(part.getFunctionCall());
+                FunctionCall call = part.getFunctionCall();
+                call.setThoughtSignature(part.getThoughtSignature());
+                calls.add(call);
             }
         }
         return calls;
