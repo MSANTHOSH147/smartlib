@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   ArrowLeft,
@@ -160,6 +160,8 @@ function Books() {
 
       setError(
         err.response?.data?.message ||
+        err.userMessage ||
+        err.message ||
         "Unable to load books."
       );
 
@@ -201,6 +203,8 @@ function Books() {
 
       setCategoryError(
         err.response?.data?.message ||
+        err.userMessage ||
+        err.message ||
         "Unable to load categories."
       );
 

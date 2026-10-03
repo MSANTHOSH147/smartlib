@@ -138,6 +138,14 @@ public class AiController {
                     result.getSources()
             );
 
+            if (!result.isSuccess()) {
+                trace.setErrorCategory(com.smartlib.ai.observability.AiErrorCategory.PROVIDER_UNAVAILABLE);
+                log.warn("AI chat orchestration unfulfilled: requestId={}", requestId);
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .header("X-AI-Request-Id", requestId)
+                        .body(response);
+            }
+
             return ResponseEntity.ok()
                     .header("X-AI-Request-Id", requestId)
                     .body(response);

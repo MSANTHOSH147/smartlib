@@ -263,7 +263,7 @@ class AiControllerTest {
                         .principal(authToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.reply", containsString("having trouble connecting")));
     }

@@ -231,6 +231,7 @@ auth.requestMatchers(
 
                     auth.requestMatchers(
                             "/actuator/health",
+                            "/actuator/health/**",
                             "/actuator/info"
                     ).permitAll();
 

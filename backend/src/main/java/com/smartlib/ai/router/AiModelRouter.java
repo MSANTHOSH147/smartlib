@@ -177,7 +177,7 @@ public class AiModelRouter {
         while (current != null) {
             if (current instanceof RestClientResponseException rcre) {
                 int status = rcre.getStatusCode().value();
-                if (status == 429 || (status >= 500 && status < 600)) {
+                if (status == 401 || status == 403 || status == 404 || status == 429 || (status >= 500 && status < 600)) {
                     return true;
                 }
             }
@@ -191,7 +191,10 @@ public class AiModelRouter {
             String msg = current.getMessage();
             if (msg != null) {
                 String lower = msg.toLowerCase(Locale.ROOT);
-                if (lower.contains("status: 429") || lower.contains("429 too many requests")
+                if (lower.contains("status: 401") || lower.contains("401 unauthorized")
+                        || lower.contains("status: 403") || lower.contains("403 forbidden")
+                        || lower.contains("status: 404") || lower.contains("404 not found")
+                        || lower.contains("status: 429") || lower.contains("429 too many requests")
                         || lower.contains("status: 5") || lower.contains("500") || lower.contains("502")
                         || lower.contains("503") || lower.contains("504")
                         || lower.contains("timeout") || lower.contains("timed out")

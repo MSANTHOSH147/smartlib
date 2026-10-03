@@ -24,11 +24,18 @@ export async function sendChatMessage(message, history = []) {
       history: formattedHistory,
     });
 
+    if (response.data && response.data.success === false) {
+      throw new Error(
+        response.data.reply ||
+          "SmartLib AI is temporarily unavailable. Please try again in a moment."
+      );
+    }
+
     return response.data;
   } catch (error) {
     if (error.response) {
       const status = error.response.status;
-      const backendMessage = error.response.data?.message;
+      const backendMessage = error.response.data?.message || error.response.data?.reply;
 
       switch (status) {
         case 400:
@@ -39,9 +46,18 @@ export async function sendChatMessage(message, history = []) {
           throw new Error(
             "Your session has expired. Please sign in again."
           );
+        case 403:
+          throw new Error(
+            "Access denied. Please check your permissions."
+          );
         case 429:
           throw new Error(
             "You've reached the AI request limit. Please try again shortly."
+          );
+        case 503:
+          throw new Error(
+            backendMessage ||
+              "SmartLib AI is temporarily unavailable. Please try again in a moment."
           );
         case 500:
           throw new Error(
@@ -53,6 +69,10 @@ export async function sendChatMessage(message, history = []) {
               "SmartLib AI encountered an unexpected issue. Please try again."
           );
       }
+    } else if (error.code === "ECONNABORTED" || (error.message && error.message.includes("timeout"))) {
+      throw new Error(
+        "Request timed out while waiting for SmartLib AI. Please try again."
+      );
     } else if (error.request) {
       throw new Error(
         "Unable to reach SmartLib AI. Check your connection and try again."
