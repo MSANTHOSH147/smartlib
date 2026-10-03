@@ -33,6 +33,20 @@ public class GeminiClient {
             throw new IllegalStateException("Gemini AI service is not configured. GEMINI_API_KEY is missing.");
         }
 
+        if (request != null && request.getContents() != null) {
+            for (com.smartlib.ai.dto.gemini.Content c : request.getContents()) {
+                if (c != null) {
+                    if ("function".equalsIgnoreCase(c.getRole()) || "tool".equalsIgnoreCase(c.getRole())) {
+                        c.setRole("user");
+                    } else if ("assistant".equalsIgnoreCase(c.getRole())) {
+                        c.setRole("model");
+                    } else if (!"model".equalsIgnoreCase(c.getRole())) {
+                        c.setRole("user");
+                    }
+                }
+            }
+        }
+
         String model = properties.getModel();
         try {
             return geminiRestClient.post()
@@ -45,8 +59,9 @@ public class GeminiClient {
                     .retrieve()
                     .body(GeminiChatResponse.class);
         } catch (RestClientResponseException ex) {
-            log.error("Gemini chat API error: status={}, errorSummary={}", ex.getStatusCode(), sanitizeErrorBody(ex.getResponseBodyAsString()));
-            throw new RuntimeException("Gemini API request failed with status: " + ex.getStatusCode().value(), ex);
+            String sanitizedBody = sanitizeErrorBody(ex.getResponseBodyAsString());
+            log.error("Gemini chat API error: status={}, errorSummary={}", ex.getStatusCode(), sanitizedBody);
+            throw new RuntimeException("Gemini API request failed with status: " + ex.getStatusCode().value() + " - " + sanitizedBody, ex);
         } catch (Exception ex) {
             log.error("Gemini chat communication error: {}", ex.getMessage());
             throw new RuntimeException("Failed to communicate with Gemini API: " + ex.getMessage(), ex);

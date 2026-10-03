@@ -154,6 +154,10 @@ public class SmartLibAiOrchestrator {
             }
         }
 
+        String lastUsedProvider = "gemini";
+        String lastUsedModel = "gemini-3.8-flash";
+        boolean fallbackUsed = false;
+
         try {
             while (loopCount < MAX_TOOL_LOOPS) {
                 loopCount++;
@@ -167,12 +171,26 @@ public class SmartLibAiOrchestrator {
 
                 AiModelResponse response = modelRouter.execute(request);
 
+                if (response != null) {
+                    if (response.getProvider() != null) {
+                        lastUsedProvider = response.getProvider();
+                        fallbackUsed = !"gemini".equalsIgnoreCase(lastUsedProvider);
+                    }
+                    if (response.getModel() != null) {
+                        lastUsedModel = response.getModel();
+                    }
+                }
+
                 if (response == null) {
                     log.warn("AI model router returned null response at loop {}", loopCount);
-                    return AiOrchestrationResult.error(
+                    AiOrchestrationResult err = AiOrchestrationResult.error(
                             "Gemini returned an empty response.",
                             "I'm sorry, I couldn't generate a response. Please try asking again."
                     );
+                    err.setProvider(lastUsedProvider);
+                    err.setModel(lastUsedModel);
+                    err.setFallbackUsed(fallbackUsed);
+                    return err;
                 }
 
                 if (response.getSources() != null && !response.getSources().isEmpty()) {
@@ -187,10 +205,14 @@ public class SmartLibAiOrchestrator {
                     String finalText = response.getText();
                     if (finalText == null || finalText.trim().isBlank()) {
                         log.warn("AI model response contained no tool call and no text");
-                        return AiOrchestrationResult.error(
+                        AiOrchestrationResult err = AiOrchestrationResult.error(
                                 "Empty text from Gemini response.",
                                 "I received an empty response. Please ask your question again."
                         );
+                        err.setProvider(lastUsedProvider);
+                        err.setModel(lastUsedModel);
+                        err.setFallbackUsed(fallbackUsed);
+                        return err;
                     }
 
                     // Optional conservative extraction of persistent user preferences
@@ -205,7 +227,11 @@ public class SmartLibAiOrchestrator {
                         }
                     }
 
-                    return AiOrchestrationResult.success(finalText.trim(), executedTools, accumulatedSources);
+                    AiOrchestrationResult result = AiOrchestrationResult.success(finalText.trim(), executedTools, accumulatedSources);
+                    result.setProvider(lastUsedProvider);
+                    result.setModel(lastUsedModel);
+                    result.setFallbackUsed(fallbackUsed);
+                    return result;
                 }
 
                 // Execute function calls
@@ -225,23 +251,35 @@ public class SmartLibAiOrchestrator {
             }
 
             log.warn("Exceeded maximum tool call loops ({})", MAX_TOOL_LOOPS);
-            return AiOrchestrationResult.error(
+            AiOrchestrationResult err = AiOrchestrationResult.error(
                     "Maximum tool call loop limit exceeded.",
                     "I was unable to complete your request because it required too many tool operations. Please try rephrasing your request."
             );
+            err.setProvider(lastUsedProvider);
+            err.setModel(lastUsedModel);
+            err.setFallbackUsed(fallbackUsed);
+            return err;
 
         } catch (IllegalStateException ex) {
             log.warn("AI service unavailable: {}", ex.getMessage());
-            return AiOrchestrationResult.error(
+            AiOrchestrationResult err = AiOrchestrationResult.error(
                     "Gemini AI is not configured.",
                     "SmartLib AI is currently offline or not configured. Please contact the administrator."
             );
+            err.setProvider(lastUsedProvider);
+            err.setModel(lastUsedModel);
+            err.setFallbackUsed(fallbackUsed);
+            return err;
         } catch (Exception ex) {
             log.error("AI orchestration error during chat execution: {}", ex.getMessage(), ex);
-            return AiOrchestrationResult.error(
+            AiOrchestrationResult err = AiOrchestrationResult.error(
                     "AI service error: " + ex.getMessage(),
                     "I'm having trouble connecting to the library assistant service. Please try again in a moment."
             );
+            err.setProvider(lastUsedProvider);
+            err.setModel(lastUsedModel);
+            err.setFallbackUsed(fallbackUsed);
+            return err;
         }
     }
 
@@ -253,22 +291,10 @@ public class SmartLibAiOrchestrator {
 
         for (Content content : history) {
             if (content == null) continue;
-            String role = content.getRole();
-            if ("user".equalsIgnoreCase(role)) {
-                turns.add(AiConversationTurn.userTurn(extractTextFromContent(content)));
-            } else if ("model".equalsIgnoreCase(role) || "assistant".equalsIgnoreCase(role)) {
-                List<AiToolCall> toolCalls = extractToolCallsFromContent(content);
-                String text = extractTextFromContent(content);
-                if (!toolCalls.isEmpty()) {
-                    turns.add(AiConversationTurn.builder()
-                            .role("model")
-                            .content(text)
-                            .toolCalls(toolCalls)
-                            .build());
-                } else {
-                    turns.add(AiConversationTurn.modelTurn(text));
-                }
-            } else if ("function".equalsIgnoreCase(role) || "tool".equalsIgnoreCase(role)) {
+            String role = content.getRole() != null ? content.getRole().trim().toLowerCase() : "";
+            boolean hasFunctionResponse = content.getParts() != null && content.getParts().stream().anyMatch(p -> p != null && p.getFunctionResponse() != null);
+
+            if (hasFunctionResponse || "function".equals(role) || "tool".equals(role)) {
                 if (content.getParts() != null) {
                     for (Part part : content.getParts()) {
                         if (part != null && part.getFunctionResponse() != null) {
@@ -279,6 +305,20 @@ public class SmartLibAiOrchestrator {
                             ));
                         }
                     }
+                }
+            } else if ("user".equals(role)) {
+                turns.add(AiConversationTurn.userTurn(extractTextFromContent(content)));
+            } else if ("model".equals(role) || "assistant".equals(role)) {
+                List<AiToolCall> toolCalls = extractToolCallsFromContent(content);
+                String text = extractTextFromContent(content);
+                if (!toolCalls.isEmpty()) {
+                    turns.add(AiConversationTurn.builder()
+                            .role("model")
+                            .content(text)
+                            .toolCalls(toolCalls)
+                            .build());
+                } else {
+                    turns.add(AiConversationTurn.modelTurn(text));
                 }
             }
         }

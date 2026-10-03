@@ -20,6 +20,16 @@ public class Content {
     private String role;
     private List<Part> parts;
 
+    public void setRole(String role) {
+        if ("function".equalsIgnoreCase(role) || "tool".equalsIgnoreCase(role)) {
+            this.role = "user";
+        } else if ("assistant".equalsIgnoreCase(role)) {
+            this.role = "model";
+        } else {
+            this.role = role;
+        }
+    }
+
     public static Content user(String text) {
         return Content.builder()
                 .role("user")
@@ -42,15 +52,28 @@ public class Content {
 
     public static Content functionResponse(String name, Map<String, Object> response) {
         return Content.builder()
-                .role("function")
+                .role("user")
                 .parts(List.of(Part.fromFunctionResponse(name, response)))
                 .build();
     }
 
     public static Content functionResponses(List<Part> parts) {
         return Content.builder()
-                .role("function")
+                .role("user")
                 .parts(parts)
                 .build();
+    }
+
+    public static class ContentBuilder {
+        public ContentBuilder role(String role) {
+            if ("function".equalsIgnoreCase(role) || "tool".equalsIgnoreCase(role)) {
+                this.role = "user";
+            } else if ("assistant".equalsIgnoreCase(role)) {
+                this.role = "model";
+            } else {
+                this.role = role;
+            }
+            return this;
+        }
     }
 }
