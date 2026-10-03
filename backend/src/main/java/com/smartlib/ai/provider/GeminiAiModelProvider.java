@@ -87,6 +87,7 @@ public class GeminiAiModelProvider implements AiModelProvider {
                     .map(fc -> AiToolCall.builder()
                             .name(fc.getName())
                             .arguments(fc.getArgs() != null ? fc.getArgs() : Collections.emptyMap())
+                            .thoughtSignature(fc.getThoughtSignature())
                             .build())
                     .toList();
         }
@@ -135,7 +136,11 @@ public class GeminiAiModelProvider implements AiModelProvider {
                                 parts.add(Part.fromText(turn.getContent()));
                             }
                             for (AiToolCall tc : turn.getToolCalls()) {
-                                parts.add(Part.fromFunctionCall(tc.getName(), tc.getArguments()));
+                                parts.add(Part.fromFunctionCall(
+                                        tc.getName(),
+                                        tc.getArguments(),
+                                        tc.getThoughtSignature()
+                                ));
                             }
                             contents.add(Content.builder().role("model").parts(parts).build());
                         } else {

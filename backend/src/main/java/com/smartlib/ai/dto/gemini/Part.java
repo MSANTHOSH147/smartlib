@@ -18,6 +18,7 @@ public class Part {
     private String text;
     private FunctionCall functionCall;
     private FunctionResponse functionResponse;
+    private String thoughtSignature;
 
     public static Part fromText(String text) {
         return Part.builder()
@@ -26,11 +27,16 @@ public class Part {
     }
 
     public static Part fromFunctionCall(String name, Map<String, Object> args) {
+        return fromFunctionCall(name, args, null);
+    }
+
+    public static Part fromFunctionCall(String name, Map<String, Object> args, String thoughtSignature) {
         return Part.builder()
                 .functionCall(FunctionCall.builder()
                         .name(name)
                         .args(args)
                         .build())
+                .thoughtSignature(thoughtSignature)
                 .build();
     }
 

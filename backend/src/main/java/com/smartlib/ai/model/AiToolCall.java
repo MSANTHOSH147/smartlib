@@ -16,4 +16,5 @@ public class AiToolCall {
     private String name;
     @Builder.Default
     private Map<String, Object> arguments = Collections.emptyMap();
+    private String thoughtSignature;
 }
