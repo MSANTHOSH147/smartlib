@@ -21,6 +21,10 @@ public class AiOrchestrationResult {
     private String errorMessage;
     @Builder.Default
     private List<AiSource> sources = new ArrayList<>();
+    private String provider;
+    private String model;
+    private boolean fallbackUsed;
+    private com.smartlib.ai.observability.AiErrorCategory errorCategory;
 
     public static AiOrchestrationResult success(String reply, List<String> toolsExecuted) {
         return success(reply, toolsExecuted, Collections.emptyList());

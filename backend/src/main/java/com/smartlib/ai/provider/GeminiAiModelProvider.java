@@ -117,7 +117,8 @@ public class GeminiAiModelProvider implements AiModelProvider {
 
         if (request.getTurns() != null) {
             for (AiConversationTurn turn : request.getTurns()) {
-                if ("tool".equalsIgnoreCase(turn.getRole())) {
+                String turnRole = turn.getRole() != null ? turn.getRole().trim().toLowerCase() : "";
+                if ("tool".equals(turnRole) || "function".equals(turnRole)) {
                     pendingToolResponses.add(Part.fromFunctionResponse(turn.getToolName(), turn.getToolResult()));
                 } else {
                     if (!pendingToolResponses.isEmpty()) {
@@ -125,9 +126,9 @@ public class GeminiAiModelProvider implements AiModelProvider {
                         pendingToolResponses.clear();
                     }
 
-                    if ("user".equalsIgnoreCase(turn.getRole())) {
+                    if ("user".equals(turnRole)) {
                         contents.add(Content.user(turn.getContent() != null ? turn.getContent() : ""));
-                    } else if ("model".equalsIgnoreCase(turn.getRole()) || "assistant".equalsIgnoreCase(turn.getRole())) {
+                    } else if ("model".equals(turnRole) || "assistant".equals(turnRole)) {
                         if (turn.getToolCalls() != null && !turn.getToolCalls().isEmpty()) {
                             List<Part> parts = new ArrayList<>();
                             if (turn.getContent() != null && !turn.getContent().isBlank()) {
@@ -140,6 +141,9 @@ public class GeminiAiModelProvider implements AiModelProvider {
                         } else {
                             contents.add(Content.model(turn.getContent() != null ? turn.getContent() : ""));
                         }
+                    } else {
+                        // Unknown or unmapped role: default safely to user turn
+                        contents.add(Content.user(turn.getContent() != null ? turn.getContent() : ""));
                     }
                 }
             }
@@ -148,6 +152,17 @@ public class GeminiAiModelProvider implements AiModelProvider {
         if (!pendingToolResponses.isEmpty()) {
             contents.add(Content.functionResponses(new ArrayList<>(pendingToolResponses)));
             pendingToolResponses.clear();
+        }
+
+        // Defensive normalization: Ensure every Gemini content object has strictly "user" or "model" role
+        for (Content c : contents) {
+            if ("function".equalsIgnoreCase(c.getRole()) || "tool".equalsIgnoreCase(c.getRole())) {
+                c.setRole("user");
+            } else if ("assistant".equalsIgnoreCase(c.getRole())) {
+                c.setRole("model");
+            } else if (!"model".equalsIgnoreCase(c.getRole())) {
+                c.setRole("user");
+            }
         }
 
         List<Tool> tools = new ArrayList<>();

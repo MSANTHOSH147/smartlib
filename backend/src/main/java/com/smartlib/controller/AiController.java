@@ -42,26 +42,36 @@ public class AiController {
     private final AiRateLimiter rateLimiter;
     private final UserMemoryService userMemoryService;
     private final com.smartlib.ai.observability.AiMetricsService metricsService;
+    private final com.smartlib.ai.config.GeminiAiProperties geminiProperties;
 
     @Autowired
     public AiController(SmartLibAiOrchestrator aiOrchestrator,
                         AiRateLimiter rateLimiter,
                         @Autowired(required = false) UserMemoryService userMemoryService,
-                        @Autowired(required = false) com.smartlib.ai.observability.AiMetricsService metricsService) {
+                        @Autowired(required = false) com.smartlib.ai.observability.AiMetricsService metricsService,
+                        @Autowired(required = false) com.smartlib.ai.config.GeminiAiProperties geminiProperties) {
         this.aiOrchestrator = aiOrchestrator;
         this.rateLimiter = rateLimiter;
         this.userMemoryService = userMemoryService;
         this.metricsService = metricsService != null ? metricsService : new com.smartlib.ai.observability.AiMetricsService(null);
+        this.geminiProperties = geminiProperties;
+    }
+
+    public AiController(SmartLibAiOrchestrator aiOrchestrator,
+                        AiRateLimiter rateLimiter,
+                        UserMemoryService userMemoryService,
+                        com.smartlib.ai.observability.AiMetricsService metricsService) {
+        this(aiOrchestrator, rateLimiter, userMemoryService, metricsService, null);
     }
 
     public AiController(SmartLibAiOrchestrator aiOrchestrator,
                         AiRateLimiter rateLimiter,
                         UserMemoryService userMemoryService) {
-        this(aiOrchestrator, rateLimiter, userMemoryService, null);
+        this(aiOrchestrator, rateLimiter, userMemoryService, null, null);
     }
 
     public AiController(SmartLibAiOrchestrator aiOrchestrator, AiRateLimiter rateLimiter) {
-        this(aiOrchestrator, rateLimiter, null, null);
+        this(aiOrchestrator, rateLimiter, null, null, null);
     }
 
     @PostMapping("/chat")
@@ -72,10 +82,14 @@ public class AiController {
         String requestId = java.util.UUID.randomUUID().toString();
         long startTime = System.nanoTime();
 
+        String configuredModel = geminiProperties != null && geminiProperties.getModel() != null
+                ? geminiProperties.getModel()
+                : "gemini-3.8-flash";
+
         com.smartlib.ai.observability.AiRequestTrace trace = com.smartlib.ai.observability.AiRequestTrace.builder()
                 .requestId(requestId)
                 .provider("gemini")
-                .model("gemini-2.5-flash")
+                .model(configuredModel)
                 .build();
 
         if (authentication == null || !authentication.isAuthenticated()
@@ -120,13 +134,21 @@ public class AiController {
             AiOrchestrationResult result = aiOrchestrator.chat(request.getMessage(), historyContents);
             long totalLatencyMs = (System.nanoTime() - startTime) / 1_000_000;
 
+            if (result.getProvider() != null) {
+                trace.setProvider(result.getProvider());
+            }
+            if (result.getModel() != null) {
+                trace.setModel(result.getModel());
+            }
+            trace.setFallbackUsed(result.isFallbackUsed());
+
             trace.setTotalLatencyMs(totalLatencyMs);
             trace.setSuccess(result.isSuccess());
             trace.setToolCount(result.getToolCallsExecuted() != null ? result.getToolCallsExecuted().size() : 0);
             trace.setToolNames(result.getToolCallsExecuted() != null ? result.getToolCallsExecuted() : Collections.emptyList());
             trace.setWebGroundingUsed(result.getSources() != null && result.getSources().stream().anyMatch(s -> "WEB".equalsIgnoreCase(s.getType())));
             trace.setMemoryUsed(request.getMessage() != null && (request.getMessage().toLowerCase().contains("recommend") || request.getMessage().toLowerCase().contains("favorite")));
-            trace.setErrorCategory(result.isSuccess() ? com.smartlib.ai.observability.AiErrorCategory.NONE : com.smartlib.ai.observability.AiErrorCategory.INTERNAL);
+            trace.setErrorCategory(result.isSuccess() ? com.smartlib.ai.observability.AiErrorCategory.NONE : determineErrorCategory(result.getErrorMessage()));
 
             log.info("{}", trace.toStructuredLog());
             metricsService.recordRequest(trace);
@@ -139,8 +161,7 @@ public class AiController {
             );
 
             if (!result.isSuccess()) {
-                trace.setErrorCategory(com.smartlib.ai.observability.AiErrorCategory.PROVIDER_UNAVAILABLE);
-                log.warn("AI chat orchestration unfulfilled: requestId={}", requestId);
+                log.warn("AI chat orchestration unfulfilled: requestId={}, errorCategory={}", requestId, trace.getErrorCategory());
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                         .header("X-AI-Request-Id", requestId)
                         .body(response);
@@ -153,11 +174,38 @@ public class AiController {
             long totalLatencyMs = (System.nanoTime() - startTime) / 1_000_000;
             trace.setTotalLatencyMs(totalLatencyMs);
             trace.setSuccess(false);
-            trace.setErrorCategory(com.smartlib.ai.observability.AiErrorCategory.INTERNAL);
+            trace.setErrorCategory(determineErrorCategory(ex.getMessage()));
             log.warn("{}", trace.toStructuredLog());
             metricsService.recordRequest(trace);
             throw ex;
         }
+    }
+
+    private com.smartlib.ai.observability.AiErrorCategory determineErrorCategory(String errorMessage) {
+        if (errorMessage == null) {
+            return com.smartlib.ai.observability.AiErrorCategory.PROVIDER_UNAVAILABLE;
+        }
+        String lower = errorMessage.toLowerCase(java.util.Locale.ROOT);
+        if (lower.contains("400") || lower.contains("bad request") || lower.contains("not supported")) {
+            return com.smartlib.ai.observability.AiErrorCategory.PROVIDER_BAD_REQUEST;
+        }
+        if (lower.contains("401") || lower.contains("403") || lower.contains("unauthorized") || lower.contains("forbidden")) {
+            return com.smartlib.ai.observability.AiErrorCategory.PROVIDER_AUTH;
+        }
+        if (lower.contains("404") || lower.contains("not found")) {
+            return com.smartlib.ai.observability.AiErrorCategory.PROVIDER_NOT_FOUND;
+        }
+        if (lower.contains("429") || lower.contains("too many requests") || lower.contains("rate limit")) {
+            return com.smartlib.ai.observability.AiErrorCategory.PROVIDER_RATE_LIMIT;
+        }
+        if (lower.contains("timeout") || lower.contains("timed out")) {
+            return com.smartlib.ai.observability.AiErrorCategory.PROVIDER_TIMEOUT;
+        }
+        if (lower.contains("500") || lower.contains("502") || lower.contains("503") || lower.contains("504")
+                || lower.contains("unavailable") || lower.contains("offline")) {
+            return com.smartlib.ai.observability.AiErrorCategory.PROVIDER_UNAVAILABLE;
+        }
+        return com.smartlib.ai.observability.AiErrorCategory.INTERNAL;
     }
 
     @GetMapping("/memory")
