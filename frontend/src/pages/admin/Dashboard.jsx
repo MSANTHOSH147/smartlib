@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertCircle,
   ArrowRight,
@@ -61,7 +61,9 @@ function AdminDashboard() {
 
     setError(
       err.response?.data?.message ||
+        err.userMessage ||
         err.response?.data ||
+        err.message ||
         "Unable to load admin dashboard."
     );
   } finally {

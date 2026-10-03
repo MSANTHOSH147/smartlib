@@ -38,14 +38,14 @@ public class GeminiClient {
             return geminiRestClient.post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/v1beta/models/{model}:generateContent")
-                            .queryParam("key", properties.getApiKey().trim())
                             .build(model))
+                    .header("x-goog-api-key", properties.getApiKey().trim())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
                     .body(GeminiChatResponse.class);
         } catch (RestClientResponseException ex) {
-            log.error("Gemini chat API error: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.error("Gemini chat API error: status={}, errorSummary={}", ex.getStatusCode(), sanitizeErrorBody(ex.getResponseBodyAsString()));
             throw new RuntimeException("Gemini API request failed with status: " + ex.getStatusCode().value(), ex);
         } catch (Exception ex) {
             log.error("Gemini chat communication error: {}", ex.getMessage());
@@ -71,8 +71,8 @@ public class GeminiClient {
             GeminiEmbeddingResponse response = geminiRestClient.post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/v1beta/models/{model}:embedContent")
-                            .queryParam("key", properties.getApiKey().trim())
                             .build(embeddingModel))
+                    .header("x-goog-api-key", properties.getApiKey().trim())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
@@ -83,11 +83,20 @@ public class GeminiClient {
             }
             return Collections.emptyList();
         } catch (RestClientResponseException ex) {
-            log.error("Gemini embedding API error: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.error("Gemini embedding API error: status={}, errorSummary={}", ex.getStatusCode(), sanitizeErrorBody(ex.getResponseBodyAsString()));
             throw new RuntimeException("Gemini embedding API failed with status: " + ex.getStatusCode().value(), ex);
         } catch (Exception ex) {
             log.error("Gemini embedding communication error: {}", ex.getMessage());
             throw new RuntimeException("Failed to generate embedding with Gemini API: " + ex.getMessage(), ex);
         }
+    }
+
+    private String sanitizeErrorBody(String rawBody) {
+        if (rawBody == null || rawBody.isBlank()) {
+            return "empty_body";
+        }
+        String sanitized = rawBody.replaceAll("AIza[0-9A-Za-z-_]{30,}", "***")
+                .replaceAll("Bearer\\s+[A-Za-z0-9-_.]+", "***");
+        return sanitized.length() > 300 ? sanitized.substring(0, 300) + "..." : sanitized;
     }
 }

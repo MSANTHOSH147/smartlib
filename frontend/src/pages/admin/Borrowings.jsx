@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -39,6 +39,8 @@ function Borrowings() {
 
       setError(
         err.response?.data?.message ||
+          err.userMessage ||
+          err.message ||
           "Unable to load borrowing records."
       );
     } finally {

@@ -20,6 +20,7 @@ import org.springframework.web.client.ResourceAccessException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -288,5 +289,133 @@ class AiModelRouterTest {
         assertThat(groq.getProviderName()).isEqualTo("groq");
         assertThat(groq.getModelName()).isEqualTo("llama-3.3-70b-versatile");
         assertThat(groq.getCapabilities().isSupportsToolCalling()).isTrue();
+    }
+
+    @Test
+    @DisplayName("13. HTTP 401 Unauthorized on primary triggers fallback to Groq")
+    void test401TriggersFallback() {
+        AiModelRequest request = AiModelRequest.builder().build();
+        HttpClientErrorException unauthorizedEx = HttpClientErrorException.create(
+                HttpStatusCode.valueOf(401),
+                "Unauthorized",
+                HttpHeaders.EMPTY,
+                new byte[0],
+                StandardCharsets.UTF_8
+        );
+
+        when(geminiProvider.generateChat(any())).thenThrow(unauthorizedEx);
+
+        AiModelResponse groqResponse = AiModelResponse.builder()
+                .provider("groq")
+                .text("Groq handled 401 fallback")
+                .build();
+
+        when(groqProvider.generateChat(any())).thenReturn(groqResponse);
+
+        AiModelResponse response = router.execute(request);
+
+        assertThat(response.getProvider()).isEqualTo("groq");
+        assertThat(response.getText()).isEqualTo("Groq handled 401 fallback");
+        verify(groqProvider, times(1)).generateChat(request);
+    }
+
+    @Test
+    @DisplayName("14. HTTP 403 Forbidden on primary triggers fallback to Groq")
+    void test403TriggersFallback() {
+        AiModelRequest request = AiModelRequest.builder().build();
+        HttpClientErrorException forbiddenEx = HttpClientErrorException.create(
+                HttpStatusCode.valueOf(403),
+                "Forbidden",
+                HttpHeaders.EMPTY,
+                new byte[0],
+                StandardCharsets.UTF_8
+        );
+
+        when(geminiProvider.generateChat(any())).thenThrow(forbiddenEx);
+
+        AiModelResponse groqResponse = AiModelResponse.builder()
+                .provider("groq")
+                .text("Groq handled 403 fallback")
+                .build();
+
+        when(groqProvider.generateChat(any())).thenReturn(groqResponse);
+
+        AiModelResponse response = router.execute(request);
+
+        assertThat(response.getProvider()).isEqualTo("groq");
+        assertThat(response.getText()).isEqualTo("Groq handled 403 fallback");
+        verify(groqProvider, times(1)).generateChat(request);
+    }
+
+    @Test
+    @DisplayName("15. HTTP 404 Not Found on primary triggers fallback to Groq")
+    void test404TriggersFallback() {
+        AiModelRequest request = AiModelRequest.builder().build();
+        HttpClientErrorException notFoundEx = HttpClientErrorException.create(
+                HttpStatusCode.valueOf(404),
+                "Not Found",
+                HttpHeaders.EMPTY,
+                new byte[0],
+                StandardCharsets.UTF_8
+        );
+
+        when(geminiProvider.generateChat(any())).thenThrow(notFoundEx);
+
+        AiModelResponse groqResponse = AiModelResponse.builder()
+                .provider("groq")
+                .text("Groq handled 404 fallback")
+                .build();
+
+        when(groqProvider.generateChat(any())).thenReturn(groqResponse);
+
+        AiModelResponse response = router.execute(request);
+
+        assertThat(response.getProvider()).isEqualTo("groq");
+        assertThat(response.getText()).isEqualTo("Groq handled 404 fallback");
+        verify(groqProvider, times(1)).generateChat(request);
+    }
+
+    @Test
+    @DisplayName("16. Primary failure after tool results executed suppresses fallback to prevent duplicate side effects")
+    void testMidToolWorkflowFailureSuppressesFallback() {
+        AiModelRequest request = AiModelRequest.builder()
+                .turns(List.of(
+                        com.smartlib.ai.model.AiConversationTurn.toolTurn("call-1", "checkBookAvailability", Map.of("available", true))
+                ))
+                .build();
+
+        when(geminiProvider.generateChat(any())).thenThrow(new RuntimeException("status: 503 Service Unavailable"));
+
+        assertThatThrownBy(() -> router.execute(request))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("AI provider failed mid-tool workflow");
+
+        verify(geminiProvider, times(1)).generateChat(request);
+        verify(groqProvider, never()).generateChat(any());
+    }
+
+    @Test
+    @DisplayName("17. Connection failure on primary triggers fallback to Groq")
+    void testConnectionFailureTriggersFallback() {
+        AiModelRequest request = AiModelRequest.builder().build();
+        ResourceAccessException connEx = new ResourceAccessException(
+                "I/O error on POST request",
+                new java.net.ConnectException("Connection refused")
+        );
+
+        when(geminiProvider.generateChat(any())).thenThrow(connEx);
+
+        AiModelResponse groqResponse = AiModelResponse.builder()
+                .provider("groq")
+                .text("Groq handled connection failure")
+                .build();
+
+        when(groqProvider.generateChat(any())).thenReturn(groqResponse);
+
+        AiModelResponse response = router.execute(request);
+
+        assertThat(response.getProvider()).isEqualTo("groq");
+        assertThat(response.getText()).isEqualTo("Groq handled connection failure");
+        verify(groqProvider, times(1)).generateChat(request);
     }
 }

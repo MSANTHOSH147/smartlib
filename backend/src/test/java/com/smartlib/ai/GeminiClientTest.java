@@ -74,8 +74,9 @@ public class GeminiClientTest {
         }
         """;
 
-        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=test-fake-key-12345"))
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent"))
                 .andExpect(method(org.springframework.http.HttpMethod.POST))
+                .andExpect(header("x-goog-api-key", "test-fake-key-12345"))
                 .andRespond(withSuccess(mockResponseBody, MediaType.APPLICATION_JSON));
 
         GeminiChatRequest request = GeminiChatRequest.builder()
@@ -112,8 +113,9 @@ public class GeminiClientTest {
         }
         """;
 
-        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent?key=test-fake-key-12345"))
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent"))
                 .andExpect(method(org.springframework.http.HttpMethod.POST))
+                .andExpect(header("x-goog-api-key", "test-fake-key-12345"))
                 .andRespond(withSuccess(mockResponseBody, MediaType.APPLICATION_JSON));
 
         List<Float> embedding = client.generateEmbedding("Clean Code");
