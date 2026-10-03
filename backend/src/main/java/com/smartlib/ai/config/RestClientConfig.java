@@ -1,5 +1,6 @@
 package com.smartlib.ai.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +16,35 @@ public class RestClientConfig {
     private final GeminiAiProperties geminiAiProperties;
     private final QdrantConfig qdrantConfig;
 
+    /**
+     * Jackson ObjectMapper used by the AI providers
+     * to serialize and deserialize provider API payloads.
+     */
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    /**
+     * Gemini REST client.
+     */
     @Bean
     public RestClient geminiRestClient() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        int timeoutSeconds = geminiAiProperties.getTimeoutSeconds() > 0 ? geminiAiProperties.getTimeoutSeconds() : 30;
-        requestFactory.setConnectTimeout(Duration.ofSeconds(timeoutSeconds));
-        requestFactory.setReadTimeout(Duration.ofSeconds(timeoutSeconds));
+        SimpleClientHttpRequestFactory requestFactory =
+                new SimpleClientHttpRequestFactory();
+
+        int timeoutSeconds =
+                geminiAiProperties.getTimeoutSeconds() > 0
+                        ? geminiAiProperties.getTimeoutSeconds()
+                        : 30;
+
+        requestFactory.setConnectTimeout(
+                Duration.ofSeconds(timeoutSeconds)
+        );
+
+        requestFactory.setReadTimeout(
+                Duration.ofSeconds(timeoutSeconds)
+        );
 
         return RestClient.builder()
                 .baseUrl("https://generativelanguage.googleapis.com")
@@ -28,33 +52,64 @@ public class RestClientConfig {
                 .build();
     }
 
+    /**
+     * Qdrant REST client.
+     */
     @Bean
     public RestClient qdrantRestClient() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(10));
-        requestFactory.setReadTimeout(Duration.ofSeconds(15));
+        SimpleClientHttpRequestFactory requestFactory =
+                new SimpleClientHttpRequestFactory();
+
+        requestFactory.setConnectTimeout(
+                Duration.ofSeconds(10)
+        );
+
+        requestFactory.setReadTimeout(
+                Duration.ofSeconds(15)
+        );
 
         RestClient.Builder builder = RestClient.builder()
                 .baseUrl(qdrantConfig.getHost())
                 .requestFactory(requestFactory);
 
         if (qdrantConfig.hasApiKey()) {
-            builder.defaultHeader("api-key", qdrantConfig.getApiKey().trim());
+            builder.defaultHeader(
+                    "api-key",
+                    qdrantConfig.getApiKey().trim()
+            );
         }
 
         return builder.build();
     }
 
+    /**
+     * Groq REST client.
+     */
     @Bean
-    public RestClient groqRestClient(GroqAiProperties groqAiProperties) {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        int timeoutSeconds = groqAiProperties.getTimeoutSeconds() > 0 ? groqAiProperties.getTimeoutSeconds() : 30;
-        requestFactory.setConnectTimeout(Duration.ofSeconds(timeoutSeconds));
-        requestFactory.setReadTimeout(Duration.ofSeconds(timeoutSeconds));
+    public RestClient groqRestClient(
+            GroqAiProperties groqAiProperties
+    ) {
+        SimpleClientHttpRequestFactory requestFactory =
+                new SimpleClientHttpRequestFactory();
 
-        String baseUrl = groqAiProperties.getBaseUrl() != null && !groqAiProperties.getBaseUrl().isBlank()
-                ? groqAiProperties.getBaseUrl()
-                : "https://api.groq.com/openai/v1";
+        int timeoutSeconds =
+                groqAiProperties.getTimeoutSeconds() > 0
+                        ? groqAiProperties.getTimeoutSeconds()
+                        : 30;
+
+        requestFactory.setConnectTimeout(
+                Duration.ofSeconds(timeoutSeconds)
+        );
+
+        requestFactory.setReadTimeout(
+                Duration.ofSeconds(timeoutSeconds)
+        );
+
+        String baseUrl =
+                groqAiProperties.getBaseUrl() != null
+                        && !groqAiProperties.getBaseUrl().isBlank()
+                        ? groqAiProperties.getBaseUrl()
+                        : "https://api.groq.com/openai/v1";
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
